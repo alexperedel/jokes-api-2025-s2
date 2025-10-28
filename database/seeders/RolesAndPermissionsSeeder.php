@@ -54,6 +54,11 @@ class RolesAndPermissionsSeeder extends Seeder
             'joke.delete.own',
             'joke.search',
             'joke.random.one',
+            'joke.trash.view',
+            'joke.trash.recover.one',
+            'joke.trash.remove.one',
+            'joke.trash.recover.all',
+            'joke.trash.empty.all',
 
             // Category permissions
             'category.browse',
