@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\v1\AuthController as AuthControllerV1;
 use App\Http\Controllers\Api\v2\AuthController as AuthControllerV2;
+use App\Http\Controllers\Api\v2\UserController as UserControllerV2;
 use App\Http\Controllers\Api\v2\CategoryController as CategoryControllerV2;
 use App\Http\Controllers\Api\v2\JokeController as JokeControllerV2;
 use App\Http\Controllers\Api\v2\ProfileController as ProfileControllerV2;
@@ -83,6 +84,24 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::resource("categories", CategoryControllerV2::class);
 
+});
+
+// User Admin routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('users/search/{keyword}', [UserControllerV2::class, 'search']);
+    
+    // Trash management routes MUST come before resource routes
+    Route::get('users/trash/list', [UserControllerV2::class, 'trash']);
+    Route::post('users/restore-all', [UserControllerV2::class, 'restoreAll']);
+    Route::delete('users/trash/empty-all', [UserControllerV2::class, 'emptyAll']);
+    Route::post('users/trash/{id}/restore', [UserControllerV2::class, 'restoreOne']);
+    Route::delete('users/trash/{id}', [UserControllerV2::class, 'emptyOne']);
+    
+    // Custom action routes
+    Route::post('users/{id}/assign-role', [UserControllerV2::class, 'assignRole']);
+    Route::post('users/{id}/restore', [UserControllerV2::class, 'restoreOne']);
+    
+    Route::apiResource('users', UserControllerV2::class);
 });
 
 /* Jokes Routes */

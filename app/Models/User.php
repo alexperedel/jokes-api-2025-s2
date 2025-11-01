@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -12,7 +13,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -64,5 +65,23 @@ class User extends Authenticatable implements MustVerifyEmail
     public function votes()
     {
         return $this->hasMany(Vote::class);
+    }
+
+    /**
+     * Boot method to handle cascade deletes
+     * 
+     * source: https://laracasts.com/discuss/channels/laravel/laravel-soft-delete-cascade
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function($user) {
+            // When user is deleted (soft or force):
+            // - Soft delete all jokes by this user
+            // - Hard delete all votes by this user
+            $user->jokes()->delete();
+            $user->votes()->delete();
+        });
     }
 }
