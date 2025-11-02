@@ -39,7 +39,7 @@ test('unauthenticated user cannot browse jokes', function () {
     $response = $this->getJson('/api/' . API_VER . '/jokes');
     
     // Assert
-    $response->assertStatus(401); // Unauthorized
+    $response->assertStatus(401);
 });
 
 // READ Tests
@@ -126,7 +126,7 @@ test('client cannot update others joke', function () {
         ]);
 
     // Assert
-    $response->assertStatus(403); // Forbidden
+    $response->assertStatus(403);
 });
 
 test('staff can update any joke', function () {

@@ -312,9 +312,6 @@ test('logout deletes all user tokens', function () {
 });
 
 test('unauthenticated user cannot logout', function () {
-    // Arrange
-    // (no authentication)
-
     // Act
     $response = $this->postJson('/api/' . API_VER . '/auth/logout');
 
@@ -353,7 +350,6 @@ test('forgot password returns success for non-existent email', function () {
     $response = $this->postJson('/api/' . API_VER . '/auth/password/forgot', $data);
 
     // Assert
-    // Should return success to prevent email enumeration
     $response->assertStatus(200)
         ->assertJson([
             'success' => true,
@@ -394,7 +390,7 @@ test('forgot password fails with missing email', function () {
 });
 
 // ============================================================================
-// RESET PASSWORD TESTS (V2 specific)
+// RESET PASSWORD TESTS
 // ============================================================================
 
 test('authenticated user can reset their own password', function () {
@@ -519,7 +515,7 @@ test('unauthenticated user cannot reset password', function () {
 });
 
 // ============================================================================
-// RESET PASSWORD FOR USER TESTS (V2 specific - admin/staff can reset others)
+// RESET PASSWORD FOR USER TESTS (admin/staff can reset others)
 // ============================================================================
 
 test('admin can send password reset link to staff user', function () {
@@ -542,7 +538,7 @@ test('admin can send password reset link to staff user', function () {
 });
 
 // ============================================================================
-// FORCE LOGOUT USER TESTS (V2 specific - admin/staff can logout others)
+// FORCE LOGOUT USER TESTS (admin/staff can logout others)
 // ============================================================================
 
 test('admin can force logout a staff user', function () {
@@ -571,7 +567,7 @@ test('admin can force logout a staff user', function () {
 });
 
 // ============================================================================
-// FORCE LOGOUT ROLE TESTS (V2 specific - admin can logout all users of a role)
+// FORCE LOGOUT ROLE TESTS (admin can logout all users of a role)
 // ============================================================================
 
 test('admin can force logout all client users', function () {

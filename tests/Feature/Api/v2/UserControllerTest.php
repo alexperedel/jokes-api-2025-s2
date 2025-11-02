@@ -41,7 +41,7 @@ test('client cannot browse users', function () {
         ->getJson('/api/' . API_VER . '/users');
     
     // Assert
-    $response->assertStatus(403); // Forbidden
+    $response->assertStatus(403);
 });
 
 test('unauthenticated user cannot browse users', function () {
@@ -49,7 +49,7 @@ test('unauthenticated user cannot browse users', function () {
     $response = $this->getJson('/api/' . API_VER . '/users');
     
     // Assert
-    $response->assertStatus(401); // Unauthorized
+    $response->assertStatus(401);
 });
 
 // READ Tests
@@ -103,7 +103,7 @@ test('staff cannot create staff user', function () {
         ]);
 
     // Assert
-    $response->assertStatus(403); // Forbidden
+    $response->assertStatus(403);
 });
 
 test('admin can create staff user', function () {
@@ -162,7 +162,7 @@ test('staff cannot update admin user', function () {
         ]);
 
     // Assert
-    $response->assertStatus(403); // Forbidden
+    $response->assertStatus(403);
 });
 
 test('admin can update staff user', function () {
@@ -200,7 +200,7 @@ test('staff cannot delete admin user', function () {
         ->deleteJson('/api/' . API_VER . '/users/' . $this->admin->id);
 
     // Assert
-    $response->assertStatus(403); // Forbidden
+    $response->assertStatus(403);
 });
 
 // SEARCH Tests
@@ -259,7 +259,7 @@ test('staff cannot assign staff role', function () {
         ]);
 
     // Assert
-    $response->assertStatus(403); // Forbidden
+    $response->assertStatus(403);
 });
 
 // TRASH Tests

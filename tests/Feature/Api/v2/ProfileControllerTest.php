@@ -72,7 +72,7 @@ test('profile update fails with duplicate email', function () {
     // Arrange
     $data = [
         'name' => 'Test User',
-        'email' => $this->staff->email, // Email already exists
+        'email' => $this->staff->email,
     ];
 
     // Act

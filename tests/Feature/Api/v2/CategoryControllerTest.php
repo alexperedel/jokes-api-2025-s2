@@ -44,7 +44,7 @@ test('unauthenticated user cannot browse categories', function () {
     $response = $this->getJson('/api/' . API_VER . '/categories');
     
     // Assert
-    $response->assertStatus(401); // Unauthorized
+    $response->assertStatus(401);
 });
 
 // READ Tests
@@ -95,7 +95,7 @@ test('client cannot create category', function () {
         ]);
 
     // Assert
-    $response->assertStatus(403); // Forbidden
+    $response->assertStatus(403);
 });
 
 test('validation fails for invalid category data', function () {
