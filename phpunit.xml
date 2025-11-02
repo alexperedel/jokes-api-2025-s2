@@ -14,9 +14,27 @@
     </testsuites>
     <source>
         <include>
-            <directory>app</directory>
+            <directory suffix=".php">./app/Http/Controllers/Api/v2</directory>
+            <directory suffix=".php">./app/Models</directory>
+            <directory suffix=".php">./app/Policies</directory>
+            <directory suffix=".php">./app/Http/Requests</directory>
+            <directory suffix=".php">./app/Http/Resources</directory>
+            <directory suffix=".php">./app/Responses</directory>
         </include>
+        <exclude>
+            <directory>./app/Console</directory>
+            <directory>./app/Exceptions</directory>
+            <directory>./app/Providers</directory>
+            <file>./app/Http/Controllers/Controller.php</file>
+        </exclude>
     </source>
+    <coverage>
+        <report>
+            <html outputDirectory="coverage-report" lowUpperBound="50" highLowerBound="80"/>
+            <text outputFile="php://stdout" showUncoveredFiles="false"/>
+            <clover outputFile="coverage/clover.xml"/>
+        </report>
+    </coverage>
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>

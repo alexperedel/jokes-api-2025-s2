@@ -15,7 +15,7 @@ class UserController extends Controller
     use AuthorizesRequests;
 
     /**
-     * Display a listing of users.
+     * Get all users with pagination.
      * 
      * @return \Illuminate\Http\JsonResponse
      */
@@ -31,9 +31,9 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified user.
+     * Get a single user with roles.
      * 
-     * @param string $id
+     * @param string $id User ID
      * @return \Illuminate\Http\JsonResponse
      */
     public function show(string $id)
@@ -50,7 +50,7 @@ class UserController extends Controller
     }
 
     /**
-     * Store a newly created user.
+     * Create a new user with role assignment.
      * 
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -62,8 +62,6 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
-            'city' => ['nullable', 'string', 'max:255'],
-            'state' => ['nullable', 'string', 'max:255'],
             'role' => ['required', 'string', 'in:client,staff,admin'],
         ];
         $validated = $request->validate($rules);
@@ -76,8 +74,6 @@ class UserController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'city' => $validated['city'] ?? null,
-            'state' => $validated['state'] ?? null,
         ]);
 
         // Assign role
@@ -94,10 +90,10 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified user.
+     * Update user name and email.
      * 
      * @param Request $request
-     * @param string $id
+     * @param string $id User ID
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, string $id)
@@ -114,8 +110,6 @@ class UserController extends Controller
         $rules = [
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'city' => ['nullable', 'string', 'max:255'],
-            'state' => ['nullable', 'string', 'max:255'],
         ];
         $validated = $request->validate($rules);
 
@@ -129,9 +123,9 @@ class UserController extends Controller
     }
 
     /**
-     * Remove the specified user (soft delete).
+     * Soft delete a user.
      * 
-     * @param string $id
+     * @param string $id User ID
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(string $id)
@@ -151,7 +145,7 @@ class UserController extends Controller
     }
 
     /**
-     * Search users by keyword (name or email).
+     * Search users by name or email.
      * 
      * @param string $keyword
      * @return \Illuminate\Http\JsonResponse
@@ -178,10 +172,10 @@ class UserController extends Controller
 
 
     /**
-     * Assign a role to a user.
+     * Assign a role to user.
      * 
      * @param Request $request
-     * @param string $id
+     * @param string $id User ID
      * @return \Illuminate\Http\JsonResponse
      */
     public function assignRole(Request $request, string $id)
@@ -211,7 +205,7 @@ class UserController extends Controller
     }
 
     /**
-     * Display all soft-deleted users.
+     * Get all soft-deleted users.
      * 
      * @return \Illuminate\Http\JsonResponse
      */
@@ -234,7 +228,7 @@ class UserController extends Controller
     /**
      * Restore a soft-deleted user.
      * 
-     * @param string $id
+     * @param string $id User ID
      * @return \Illuminate\Http\JsonResponse
      */
     public function restoreOne(string $id)
@@ -282,9 +276,9 @@ class UserController extends Controller
     }
 
     /**
-     * Permanently delete a specific user from trash.
+     * Permanently delete a user from trash.
      * 
-     * @param string $id
+     * @param string $id User ID
      * @return \Illuminate\Http\JsonResponse
      */
     public function emptyOne(string $id)
@@ -304,7 +298,7 @@ class UserController extends Controller
     }
 
     /**
-     * Permanently delete all soft-deleted users from trash.
+     * Permanently delete all users from trash.
      * 
      * @return \Illuminate\Http\JsonResponse
      */

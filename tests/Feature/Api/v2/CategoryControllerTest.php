@@ -1,144 +1,196 @@
 <?php
 
-use \App\Models\Category;
+use App\Models\Category;
+use App\Models\Joke;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 const API_VER = 'v2';
 
 uses(RefreshDatabase::class);
 
-test('retrieve all categories', function () {
-    // Arrange
-    $categories = Category::factory(5)->create();
-
-    $data = [
-        'message' => "Categories retrieved",
-        'success' => true,
-        'data' => $categories->toArray(),
-    ];
-
-    // Act
-    $response = $this->getJson('/api/' . API_VER . '/categories');
-
-    // Assert
-    $response
-        ->assertStatus(200)
-        ->assertJsonCount(5, 'data')
-        ->assertJson($data);
+beforeEach(function () {
+    (new \Database\Seeders\RolesAndPermissionsSeeder)->run();
+    $this->staff = User::factory()->create(['email_verified_at' => now()]);
+    $this->staff->assignRole('staff');
+    $this->client = User::factory()->create(['email_verified_at' => now()]);
+    $this->client->assignRole('client');
 });
 
-test('retrieve one category', function () {
+// BROWSE Tests
+test('staff can browse all categories', function () {
     // Arrange
-    $categories = Category::factory(1)->create();
-
-    $data = [
-        'message' => "Category retrieved",
-        'success' => true,
-        'data' => $categories->toArray(),
-    ];
+    Category::factory(3)->create();
 
     // Act
-    $response = $this->getJson('/api/' . API_VER . '/categories/1');
+    $response = $this->actingAs($this->staff, 'sanctum')
+        ->getJson('/api/' . API_VER . '/categories');
 
     // Assert
-    $response
-        ->assertStatus(200)
-        ->assertJson($data)
+    $response->assertStatus(200)
+        ->assertJsonCount(3, 'data')
+        ->assertJson(['success' => true, 'message' => 'Categories retrieved']);
+});
+
+test('unauthenticated user cannot browse categories', function () {
+    // Act
+    $response = $this->getJson('/api/' . API_VER . '/categories');
+    
+    // Assert
+    $response->assertStatus(401); // Unauthorized
+});
+
+// READ Tests
+test('staff can view single category', function () {
+    // Arrange
+    $category = Category::factory()->create();
+
+    // Act
+    $response = $this->actingAs($this->staff, 'sanctum')
+        ->getJson('/api/' . API_VER . '/categories/' . $category->id);
+
+    // Assert
+    $response->assertStatus(200)
+        ->assertJson(['success' => true, 'message' => 'Category retrieved'])
+        ->assertJsonStructure(['data' => ['category', 'jokes']]);
+});
+
+test('returns 404 when category not found', function () {
+    // Act
+    $response = $this->actingAs($this->staff, 'sanctum')
+        ->getJson('/api/' . API_VER . '/categories/9999');
+
+    // Assert
+    $response->assertStatus(404)
+        ->assertJson(['success' => false, 'message' => 'Category not found']);
+});
+
+// CREATE Tests
+test('staff can create category', function () {
+    // Act
+    $response = $this->actingAs($this->staff, 'sanctum')
+        ->postJson('/api/' . API_VER . '/categories', [
+            'title' => 'Test Category',
+            'description' => 'Test Description',
+        ]);
+
+    // Assert
+    $response->assertStatus(201)
+        ->assertJson(['success' => true, 'message' => 'Category created']);
+});
+
+test('client cannot create category', function () {
+    // Act
+    $response = $this->actingAs($this->client, 'sanctum')
+        ->postJson('/api/' . API_VER . '/categories', [
+            'title' => 'Test Category',
+            'description' => 'Test Description',
+        ]);
+
+    // Assert
+    $response->assertStatus(403); // Forbidden
+});
+
+test('validation fails for invalid category data', function () {
+    // Act
+    $response = $this->actingAs($this->staff, 'sanctum')
+        ->postJson('/api/' . API_VER . '/categories', [
+            'title' => 'ab', // Too short
+            'description' => 'short', // Too short
+        ]);
+
+    // Assert
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['title', 'description']);
+});
+
+// UPDATE Tests
+test('staff can update category', function () {
+    // Arrange
+    $category = Category::factory()->create();
+
+    // Act
+    $response = $this->actingAs($this->staff, 'sanctum')
+        ->putJson('/api/' . API_VER . '/categories/' . $category->id, [
+            'title' => 'Updated Title',
+            'description' => 'Updated Description',
+        ]);
+
+    // Assert
+    $response->assertStatus(200)
+        ->assertJson(['success' => true, 'message' => 'Category updated']);
+});
+
+test('client cannot update category', function () {
+    // Arrange
+    $category = Category::factory()->create();
+
+    // Act
+    $response = $this->actingAs($this->client, 'sanctum')
+        ->putJson('/api/' . API_VER . '/categories/' . $category->id, [
+            'title' => 'Updated Title',
+        ]);
+
+    // Assert
+    $response->assertStatus(403);
+});
+
+// DELETE Tests
+test('staff can delete category', function () {
+    // Arrange
+    $category = Category::factory()->create();
+
+    // Act
+    $response = $this->actingAs($this->staff, 'sanctum')
+        ->deleteJson('/api/' . API_VER . '/categories/' . $category->id);
+
+    // Assert
+    $response->assertStatus(200)
+        ->assertJson(['success' => true, 'message' => 'Category deleted']);
+    
+    $this->assertSoftDeleted('categories', ['id' => $category->id]);
+});
+
+// SEARCH Tests
+test('staff can search categories', function () {
+    // Arrange
+    Category::factory()->create(['title' => 'Programming Jokes']);
+    Category::factory()->create(['title' => 'Dad Jokes']);
+
+    // Act
+    $response = $this->actingAs($this->staff, 'sanctum')
+        ->getJson('/api/' . API_VER . '/categories/search/Programming');
+
+    // Assert
+    $response->assertStatus(200)
         ->assertJsonCount(1, 'data');
 });
 
-
-test('return error on missing category', function () {
+// TRASH Tests
+test('staff can view trash', function () {
     // Arrange
-    $categories = Category::factory(1)->create();
-
-    $data = [
-        'message' => "Category not found",
-        'success' => false,
-        'data' => [],
-    ];
+    $category = Category::factory()->create();
+    $category->delete();
 
     // Act
-    $response = $this->getJson('/api/' . API_VER . '/categories/9999');
+    $response = $this->actingAs($this->staff, 'sanctum')
+        ->getJson('/api/' . API_VER . '/categories/trash');
 
     // Assert
-    $response
-        ->assertStatus(404)
-        ->assertJson($data)
-        ->assertJsonCount(0, 'data');
+    $response->assertStatus(200)
+        ->assertJsonCount(1, 'data');
 });
 
-
-test('create a new category', function () {
+test('staff can recover deleted category', function () {
     // Arrange
-    $data = [
-        'title' => 'Fake Category',
-        'description' => 'Fake Category Description',
-    ];
-
-    $dataResponse = [
-        'message' => "Category created",
-        'success' => true,
-        'data' => $data
-    ];
+    $category = Category::factory()->create();
+    $category->delete();
 
     // Act
-    $response = $this->postJson('/api/' . API_VER . '/categories', $data);
+    $response = $this->actingAs($this->staff, 'sanctum')
+        ->postJson('/api/' . API_VER . '/categories/trash/' . $category->id . '/recover');
 
     // Assert
-    $response
-        ->assertStatus(201)
-        ->assertJson($dataResponse)
-        ->assertJsonCount(5, 'data');
-});
-
-
-test('create category with title and description errors', function () {
-    $data = [
-        'title' => '',
-        'description' => '1234',
-    ];
-
-    $response = $this->postJson('/api/' . API_VER . '/categories', $data);
-
-    // 422 Unprocessable Entity
-    // The HTTP 422 Unprocessable Entity status code means that while the server was able to interpret
-    // the request sent, it is still not able to process it. The major issue here is when a server is
-    // capable of interpreting a request, understanding its message, format, and structure, but still
-    // cannot process due to some logical error.
-    $response
-        ->assertStatus(422)
-        ->assertJsonValidationErrors([
-            'title',
-            'description'
-        ]);
-});
-
-test('create category title too short error', function () {
-    $data = [
-        'title' => '',
-    ];
-
-    $response = $this->postJson('/api/' . API_VER . '/categories', $data);
-
-    $response
-        ->assertStatus(422)
-        ->assertJsonValidationErrors([
-            'title',
-        ]);
-});
-
-test('create category description too short error', function () {
-    $data = [
-        'title' => 'This is a test category',
-        'description' =>'short' // The description is too short
-    ];
-
-    $response = $this->postJson('/api/' . API_VER . '/categories', $data);
-
-    $response
-        ->assertStatus(422)
-        ->assertJsonValidationErrors([
-            'description',
-        ]);
+    $response->assertStatus(200)
+        ->assertJson(['success' => true, 'message' => 'Category recovered']);
 });

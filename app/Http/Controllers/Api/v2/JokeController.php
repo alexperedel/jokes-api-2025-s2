@@ -16,7 +16,7 @@ class JokeController extends Controller
     use AuthorizesRequests;
 
     /**
-     * Display a listing of the jokes.
+     * Get all jokes.
      * 
      * @return \Illuminate\Http\JsonResponse
      */
@@ -30,17 +30,17 @@ class JokeController extends Controller
             $jokes = Joke::whereHas('categories', function ($q) {
                 $q->where('title', '!=', 'Unknown')
                 ->whereNull('deleted_at');
-            })->get();
+            })->paginate(15);
         }
         else {
-            $jokes = Joke::all();
+            $jokes = Joke::paginate(15);
         }
 
         return ApiResponse::success($jokes, "Jokes retrieved");
     }
 
     /**
-     * Store a newly created joke.
+     * Create a new joke with categories.
      * 
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -156,7 +156,7 @@ class JokeController extends Controller
         return ApiResponse::success(null, 'Joke deleted', 200);
     }
 
-       /**
+    /**
      * Show all soft deleted Jokes
      *
      * @param Request $request

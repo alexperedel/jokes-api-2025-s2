@@ -21,16 +21,16 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')
     ->group(function () {
-        Route::post('register', [AuthControllerV1::class, 'register']);
-        Route::post('login', [AuthControllerV1::class, 'login']);
+        Route::post('register', [AuthControllerV2::class, 'register']);
+        Route::post('login', [AuthControllerV2::class, 'login']);
         
         // Forgot Password
         Route::post('password/forgot', [AuthControllerV2::class, 'forgotPassword'])
             ->name('auth.password.forgot');
 
-        Route::get('profile', [AuthControllerV1::class, 'profile'])
+        Route::get('profile', [AuthControllerV2::class, 'profile'])
             ->middleware(['auth:sanctum',]);
-        Route::post('logout', [AuthControllerV1::class, 'logout'])
+        Route::post('logout', [AuthControllerV2::class, 'logout'])
             ->middleware(['auth:sanctum',]);
 
         Route::middleware('auth:sanctum')->group(function () {

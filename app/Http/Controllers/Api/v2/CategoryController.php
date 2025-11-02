@@ -12,8 +12,9 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class CategoryController extends Controller
 {
     use AuthorizesRequests;
+    
     /**
-     * Display a listing of the Categories.
+     * Get all categories.
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -26,7 +27,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Store a newly created Category in storage.
+     * Create a new category.
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -46,7 +47,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Display the specified Category.
+     * Get a category with 5 random jokes.
      *
      * @param string $id
      * @return \Illuminate\Http\JsonResponse
@@ -70,7 +71,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Update the specified Category in storage.
+     * Update a category.
      *
      * @param Request $request
      * @param string $id
@@ -97,7 +98,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Remove the specified Category from storage.
+     * Soft delete a category.
      *
      * @param string $id
      * @return \Illuminate\Http\JsonResponse
@@ -116,7 +117,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Show all soft deleted Categories
+     * Get all soft-deleted categories.
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -133,7 +134,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Recover all soft deleted categories from trash
+     * Restore all soft-deleted categories.
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -153,7 +154,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Remove all soft deleted categories from trash
+     * Permanently delete all categories from trash.
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -173,8 +174,8 @@ class CategoryController extends Controller
         return ApiResponse::success(null, "Soft deleted categories permanently removed");
     }
 
-    /**
-     * Recover specified soft deleted category from trash
+        /**
+     * Restore a soft-deleted category.
      *
      * @param string $id
      * @return \Illuminate\Http\JsonResponse
@@ -193,7 +194,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Remove specified soft deleted category from trash
+     * Permanently delete a category from trash.
      *
      * @param string $id
      * @return \Illuminate\Http\JsonResponse
@@ -213,7 +214,7 @@ class CategoryController extends Controller
 
 
     /**
-     * Search categories by keyword
+     * Search categories by title.
      *
      * @param string $keyword
      * @return \Illuminate\Http\JsonResponse

@@ -15,6 +15,13 @@ class VoteController extends Controller
 {
     use AuthorizesRequests;
 
+    /**
+     * Vote on a joke (1=like, -1=dislike, 0=remove).
+     * 
+     * @param Request $request
+     * @param string $joke_id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function vote(Request $request, string $joke_id) {
         $user = Auth::user();
 
@@ -61,6 +68,12 @@ class VoteController extends Controller
         }
     }
 
+    /**
+     * Clear all votes for a specific user.
+     * 
+     * @param string $user_id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function clearUserVotes(string $user_id) {
         $user = User::find($user_id);
 
@@ -90,6 +103,11 @@ class VoteController extends Controller
         return ApiResponse::success(null,'Votes Deleted', 200);
     }
 
+    /**
+     * Reset all votes in the system.
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function resetAllVotes() {
         $this->authorize('resetAll', Vote::class);
 

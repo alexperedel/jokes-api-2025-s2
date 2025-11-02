@@ -33,7 +33,6 @@ class AdminCategoryController extends Controller
             ->withCount('jokes')
             ->paginate($perPage, ['*'], 'page', $page);
 
-        // TODO: get trashed category count
         $trashCount = Category::onlyTrashed()->count();
 
         // return view
