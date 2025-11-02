@@ -22,3 +22,9 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Code Coverage Reports
+/coverage
+/coverage-report
+/.phpunit.cache
+*.coverage
