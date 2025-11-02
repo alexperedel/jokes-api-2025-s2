@@ -7,8 +7,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 const API_VER = 'v2';
 
+// RefreshDatabase resets database after each test to ensure test isolation
+// Source: https://laravel.com/docs/11.x/database-testing#resetting-the-database-after-each-test
 uses(RefreshDatabase::class);
 
+// Pest beforeEach hook runs before each test case for setup
+// Used to seed roles and create authenticated test users
+// Source: https://pestphp.com/docs/hooks#beforeeach
 beforeEach(function () {
     (new \Database\Seeders\RolesAndPermissionsSeeder)->run();
     $this->staff = User::factory()->create(['email_verified_at' => now()]);
@@ -23,6 +28,8 @@ test('staff can browse all categories', function () {
     Category::factory(3)->create();
 
     // Act
+    // actingAs() authenticates user with Sanctum for API testing
+    // Source: https://laravel.com/docs/11.x/sanctum#testing
     $response = $this->actingAs($this->staff, 'sanctum')
         ->getJson('/api/' . API_VER . '/categories');
 

@@ -5,8 +5,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 const API_VER = 'v2';
 
+// RefreshDatabase resets database after each test for isolation
+// Source: https://laravel.com/docs/11.x/database-testing#resetting-the-database-after-each-test
 uses(RefreshDatabase::class);
 
+// Pest beforeEach hook runs before each test case for setup
+// Source: https://pestphp.com/docs/hooks#beforeeach
 beforeEach(function () {
     (new \Database\Seeders\RolesAndPermissionsSeeder)->run();
     $this->staff = User::factory()->create(['email_verified_at' => now()]);

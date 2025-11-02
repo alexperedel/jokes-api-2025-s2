@@ -62,6 +62,8 @@ class CategoryController extends Controller
             return ApiResponse::error($category, "Category not found", 404);
         }
 
+        // Query relationship to get random jokes for this category
+        // Source: https://laravel.com/docs/11.x/eloquent-relationships#querying-relationships
         $randomJokes = $category->jokes()->inRandomOrder()->limit(5)->get();
 
         return ApiResponse::success([

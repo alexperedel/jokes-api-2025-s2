@@ -35,6 +35,9 @@ class VoteController extends Controller
             return ApiResponse::error(null, "Joke not found", 404);
         }
 
+        // Query for existing vote using compound where clause
+        // first() returns single model or null (unlike firstOrFail which throws exception)
+        // Source: https://laravel.com/docs/11.x/queries#retrieving-a-single-row-column-from-a-table
         $existingVote = Vote::where('user_id', $user->id)
                     ->where('joke_id', $joke_id)
                     ->first();

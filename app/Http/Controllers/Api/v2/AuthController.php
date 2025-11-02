@@ -61,6 +61,8 @@ class AuthController extends Controller
             ),
         ]);
 
+        // Create Sanctum API token
+        // Source: https://stackoverflow.com/questions/64680188/laravel-sanctum-retrieve-plaintexttoken-without-creating-a-new-token
         $token = $user->createToken('MyAppToken')->plainTextToken;
 
         return ApiResponse::success(
@@ -104,6 +106,9 @@ class AuthController extends Controller
             );
         }
 
+        // Auth::attempt() validates credentials and starts session
+        // Returns true if credentials valid, false otherwise
+        // Source: https://laravel.com/docs/11.x/authentication#authenticating-users
         if (!Auth::attempt($request->only('email', 'password'))) {
             return ApiResponse::error(
                 [],
@@ -112,6 +117,8 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
+        // Create Sanctum API token for authenticated user
+        // Source: https://laravel.com/docs/11.x/sanctum#issuing-api-tokens
         $token = $user->createToken('MyAppToken')->plainTextToken;
 
         return ApiResponse::success(

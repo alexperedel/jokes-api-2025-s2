@@ -7,8 +7,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 const API_VER = 'v2';
 
+// RefreshDatabase resets database after each test for isolation
+// Source: https://laravel.com/docs/11.x/database-testing#resetting-the-database-after-each-test
 uses(RefreshDatabase::class);
 
+// Pest beforeEach hook runs before each test case for setup
+// Source: https://pestphp.com/docs/hooks#beforeeach
 beforeEach(function () {
     // Seed roles and permissions
     (new \Database\Seeders\RolesAndPermissionsSeeder)->run();

@@ -12,10 +12,14 @@ class CategoryPolicy
      */
     public function viewAny(User $user): bool
     {
+        // Email verification check using Laravel's built-in hasVerifiedEmail method
+        // Source: https://medium.com/@joshuaadedoyin2/laravel-email-verification-for-apis-a-step-by-step-guide-4e231bf14370
         if (!$user->hasVerifiedEmail()) {
             return false;
         }
 
+        // Check if user has specific permission using Spatie Permission package
+        // Source: https://spatie.be/docs/laravel-permission/v6/basic-usage/basic-usage
         return $user->can('category.browse');
     }
 

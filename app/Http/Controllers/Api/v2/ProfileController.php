@@ -28,6 +28,8 @@ class ProfileController extends Controller
         }
 
         // Validate - email must be unique except for current user
+        // Validator::make() for manual validation with more control than $request->validate()
+        // Source: https://laravel.com/docs/11.x/validation#rule-unique
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],

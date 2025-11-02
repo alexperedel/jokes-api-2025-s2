@@ -13,6 +13,9 @@ use Spatie\Permission\Traits\HasRoles;
 
 class JokeController extends Controller
 {
+    // AuthorizesRequests trait provides authorize() method for policy checks
+    // Could also use it in Controller.php (might be even better way)
+    // Source: https://stackoverflow.com/questions/73981403/how-does-a-laravel-controller-call-authorize-function
     use AuthorizesRequests;
 
     /**
@@ -26,6 +29,8 @@ class JokeController extends Controller
 
         $user = auth()->user();
         
+        // Filter by categories using whereHas for efficient querying
+        // Source: https://laravel.com/docs/11.x/eloquent-relationships#querying-relationship-existence
         if ($user->hasRole('client')) {
             $jokes = Joke::whereHas('categories', function ($q) {
                 $q->where('title', '!=', 'Unknown')
@@ -33,6 +38,8 @@ class JokeController extends Controller
             })->paginate(15);
         }
         else {
+            // Laravel pagination
+            // Source: https://laravel.com/docs/11.x/pagination#paginating-eloquent-results
             $jokes = Joke::paginate(15);
         }
 
@@ -49,7 +56,10 @@ class JokeController extends Controller
     {
         $this->authorize("create", Joke::class);
 
-        // Validate
+        // Laravel validation with array syntax for rules
+        // 'categories.*' validates each array item individually
+        // 'exists:categories,id' checks foreign key constraint
+        // Source: https://laravel.com/docs/11.x/validation#available-validation-rules
         $rules = [
             'title' => ['string', 'required', 'min:3', 'max:128'],
             'content' => ['string', 'required', 'min:3', 'max:512'],
@@ -65,6 +75,8 @@ class JokeController extends Controller
             'user_id' => auth()->id(),
         ]);
 
+        // Sync categories using many-to-many relationship
+        // Source: https://laravel.com/docs/11.x/eloquent-relationships#syncing-associations
         $joke->categories()->sync($validated['categories']);
 
         return ApiResponse::success($joke, 'Joke created', 201);
@@ -166,6 +178,8 @@ class JokeController extends Controller
     {
         $this->authorize('viewTrashed', Joke::class);
 
+        // Retrieve only soft-deleted jokes for trash management
+        // Source: https://laravel.com/docs/11.x/eloquent#soft-deleting
         $jokes = Joke::onlyTrashed()->latest()->get();
         if (count($jokes) === 0) {
             return ApiResponse::error(null, "No soft deleted jokes found", 404);
@@ -298,6 +312,8 @@ class JokeController extends Controller
               ->orWhere('content', 'like', "%{$keyword}%");
         });
 
+        // Filter by categories using whereHas for relationship queries
+        // Source: https://laravel.com/docs/11.x/eloquent-relationships#querying-relationship-existence
         if ($user->hasRole('client')) {
             $query->whereHas('categories', function ($q) {
                 $q->where('categories.title', '!=', 'Unknown')

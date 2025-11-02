@@ -195,7 +195,8 @@ class UserController extends Controller
         // Authorize with policy (checks both user.assign.role and user.add.{role} permissions)
         $this->authorize('assignRole', [$user, $validated['role']]);
 
-        // Remove all existing roles and assign new one
+        // Remove all existing roles and assign new one using Spatie Laravel Permission
+        // Source: https://spatie.be/docs/laravel-permission/v6/basic-usage/basic-usage
         $user->syncRoles([$validated['role']]);
 
         // Load roles for response
@@ -213,6 +214,8 @@ class UserController extends Controller
     {
         $this->authorize('viewTrashed', User::class);
 
+        // Retrieve only soft-deleted users for trash management
+        // Source: https://laravel.com/docs/11.x/eloquent#soft-deleting
         $users = User::onlyTrashed()
             ->with('roles')
             ->orderBy('deleted_at', 'desc')

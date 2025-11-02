@@ -6,8 +6,12 @@ use Illuminate\Support\Facades\Hash;
 
 const API_VER = 'v2';
 
+// RefreshDatabase resets database after each test for isolation
+// Source: https://laravel.com/docs/11.x/database-testing#resetting-the-database-after-each-test
 uses(RefreshDatabase::class);
 
+// Pest beforeEach hook runs before each test case for setup
+// Source: https://pestphp.com/docs/hooks#beforeeach
 beforeEach(function () {
     // Seed roles and permissions
     (new \Database\Seeders\RolesAndPermissionsSeeder)->run();
@@ -37,9 +41,13 @@ test('user can register with valid data', function () {
     ];
 
     // Act
+    // postJson() sends JSON POST request without authentication
+    // Source: https://laravel.com/docs/11.x/http-tests#making-requests
     $response = $this->postJson('/api/' . API_VER . '/auth/register', $userData);
 
     // Assert
+    // assertJsonStructure() validates response JSON structure without exact values
+    // Source: https://laravel.com/docs/11.x/http-tests#assert-json-structure
     $response->assertStatus(201)
         ->assertJson([
             'success' => true,

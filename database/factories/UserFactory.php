@@ -18,6 +18,9 @@ class UserFactory extends Factory
 
     /**
      * Define the model's default state.
+     * 
+     * Factories use Faker to generate realistic test data
+     * Source: https://laravel.com/docs/11.x/eloquent-factories#defining-model-factories
      *
      * @return array<string, mixed>
      */
@@ -34,6 +37,9 @@ class UserFactory extends Factory
 
     /**
      * Indicate that the model's email address should be unverified.
+     * 
+     * Factory states allow variations of default factory definition
+     * Source: https://laravel.com/docs/11.x/eloquent-factories#factory-states
      */
     public function unverified(): static
     {

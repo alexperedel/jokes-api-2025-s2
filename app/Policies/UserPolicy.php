@@ -51,7 +51,9 @@ class UserPolicy
 
     /**
      * Check if user can create another user with specific role.
-     * Use this in controller for role-specific validation.
+     * Custom policy method for role-based user creation authorization.
+     * 
+     * Source: https://laravel.com/docs/11.x/authorization#policy-methods
      */
     public function createWithRole(User $user, string $role): bool
     {
