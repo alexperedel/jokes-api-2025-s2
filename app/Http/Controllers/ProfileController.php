@@ -50,7 +50,7 @@ class ProfileController extends Controller
 
         Auth::logout();
 
-        $user->delete();
+        $user->forceDelete(); // Force delete instead of soft delete
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

@@ -21,6 +21,7 @@ beforeEach(function () {
 // BROWSE Tests
 test('staff can browse all jokes', function () {
     // Arrange
+    Joke::query()->forceDelete();
     Joke::factory(3)->create(['user_id' => $this->staff->id]);
 
     // Act
@@ -29,7 +30,7 @@ test('staff can browse all jokes', function () {
 
     // Assert
     $response->assertStatus(200)
-        ->assertJsonCount(3, 'data')
+        ->assertJsonCount(3, 'data.data')
         ->assertJson(['success' => true, 'message' => 'Jokes retrieved']);
 });
 
