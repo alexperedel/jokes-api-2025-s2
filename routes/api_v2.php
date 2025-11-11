@@ -7,18 +7,14 @@ use App\Http\Controllers\Api\v2\CategoryController as CategoryControllerV2;
 use App\Http\Controllers\Api\v2\JokeController as JokeControllerV2;
 use App\Http\Controllers\Api\v2\ProfileController as ProfileControllerV2;
 use App\Http\Controllers\Api\v2\VoteController as VoteControllerV2;
+use App\Http\Controllers\Api\v2\RoleController as RoleControllerV2;
 use Illuminate\Support\Facades\Route;
 
 /**
  * API Version 2 Routes
  */
 
-/**
- * User API Routes
- * - Register, Login (no authentication)
- * - Profile, Logout, User details (authentication required)
- */
-
+/* User API Routes */
 Route::prefix('auth')
     ->group(function () {
         Route::post('register', [AuthControllerV2::class, 'register']);
@@ -147,4 +143,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // Superuser: Reset all votes in the system
     Route::delete('votes/reset', [VoteControllerV2::class, 'resetAllVotes'])
         ->name('votes.reset.all');
+});
+
+/* Roles Routes */
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('roles/search/{keyword}', [RoleControllerV2::class, 'search'])
+        ->name('roles.search');
+
+    // Resource routes for BREADS operations
+    Route::apiResource('roles', RoleControllerV2::class);
 });
